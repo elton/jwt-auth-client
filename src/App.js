@@ -1,22 +1,22 @@
 import React, {useState} from 'react';
 import axios from 'axios';
 
-// const apiURL = 'http://localhost:8080';
+const apiURL = 'http://localhost:3000';
 
-// axios.interceptors.request.use(
-//     config => {
-//         const { origin } = new URL(config.url);
-//         const allowedOrigins = [apiURL];
-//         const token = localStorage.getItem('token');
-//         if (allowedOrigins.includes(origin)) {
-//             config.headers.authorization = `Bearer ${token}`;
-//         }
-//         return config;
-//     },
-//     error => {
-//         return Promise.reject(error);
-//     }
-// );
+axios.interceptors.request.use(
+    config => {
+        const { origin } = new URL(`${apiURL}`+config.url);
+        const allowedOrigins = [apiURL];
+        const token = localStorage.getItem('token');
+        if (allowedOrigins.includes(origin)) {
+            config.headers.authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    error => {
+        return Promise.reject(error);
+    }
+);
 
 function App() {
     const storeJWT = localStorage.getItem('token');
@@ -30,12 +30,35 @@ function App() {
                 "password":"password"
             }
         )
-        console.log(data.access_token)
+        localStorage.setItem('token',data.access_token)
+        setJwt(data.access_token)
+    }
+
+    const getTodos = async() => {
+        try {
+            const {data} = await axios.get('/todos');
+            setTodos(data)
+            setFetchError(null)
+        } catch(err) {
+            setFetchError(err.messages)
+        }
     }
     return (
     <>
         <section>
-            <button onClick={()=>getJwt()}>Get JWt</button>
+            <button onClick={()=>getJwt()}>Get JWT</button>
+            {jwt && (
+                <pre><code>{jwt}</code></pre>
+            )}
+        </section>
+        <br />
+        <section>
+            <button onClick={()=>getTodos()}>Get Todos</button>
+            <ul>
+                {todos.map((todo,i) =>(
+                    <li key={i}>{todo}</li>
+                ))}
+            </ul>
         </section>
     </>
   );
