@@ -1,22 +1,23 @@
 import React, {useState} from 'react';
 import axios from 'axios';
 
-const apiURL = 'http://localhost:3000';
+// const apiURL = 'http://localhost:3000';
 
-axios.interceptors.request.use(
-    config => {
-        const { origin } = new URL(`${apiURL}`+config.url);
-        const allowedOrigins = [apiURL];
-        const token = localStorage.getItem('token');
-        if (allowedOrigins.includes(origin)) {
-            config.headers.authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    error => {
-        return Promise.reject(error);
-    }
-);
+// 拦截器，将token从localStorage中读取出放入请求header中
+// axios.interceptors.request.use(
+//     config => {
+//         const { origin } = new URL(`${apiURL}`+config.url);
+//         const allowedOrigins = [apiURL];
+//         const token = localStorage.getItem('token');
+//         if (allowedOrigins.includes(origin)) {
+//             config.headers.authorization = `Bearer ${token}`;
+//         }
+//         return config;
+//     },
+//     error => {
+//         return Promise.reject(error);
+//     }
+// );
 
 function App() {
     const storeJWT = localStorage.getItem('token');
@@ -30,7 +31,8 @@ function App() {
                 "password":"password"
             }
         )
-        localStorage.setItem('token',data.access_token)
+        // use HTTPOnly cookie, need not use localStorage.
+        // localStorage.setItem('token',data.access_token)
         setJwt(data.access_token)
     }
 
